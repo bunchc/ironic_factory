@@ -28,7 +28,6 @@ RUN echo "===> Installing helpers and configuring Ansible..." \
   &&  echo 'localhost' > /etc/ansible/hosts
 
 COPY entrypoint.sh /entrypoint.sh
-COPY playbooks/ /playbooks
-COPY scripts/ /scripts
+COPY ansible/ /ansible
 CMD ["ansible-playbook" "--version"]
 ENTRYPOINT ["/entrypoint.sh"]
