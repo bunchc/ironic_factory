@@ -4,10 +4,23 @@
     instance metadata like server IP and ID for further consumption.
   hosts: localhost
   connection: local
+  vars:
+    debug_workflow: false
+    pip_pyrax: false
   tasks:
+    - name: "Include debugging"
+      include_tasks: debug.yml
+      when:
+        - debug_workflow is defined
+        - debug_workflow
+
     - name: Install Rackspace module dependencies
       pip:
         name: pyrax
+        extra_args: --user --no-cache-dir
+      when:
+        - pip_pyrax is defined
+        - pip_pyrax
 
     - name: Add SSH key to Rackspace account
       local_action:
@@ -21,12 +34,12 @@
     - name: "Create server"
       local_action:
         module: rax
-        image: 03cc1fe2-b597-406c-a7b1-22b2a57850cf
+        image: "{{ lookup('env', 'RACKSPACE_IMAGE') }}"
         api_key: "{{ lookup('env', 'RACKSPACE_API_TOKEN') }}"
         username: "{{ lookup('env', 'RACKSPACE_USERNAME') }}"
         region: "{{ lookup('env', 'RACKSPACE_REGION') }}"
         tenant_id: "{{ lookup('env', 'RACKSPACE_TENANT_ID') }}"
-        flavor: onmetal-io2
+        flavor: "{{ lookup('env', 'RACKSPACE_FLAVOR') }}"
         wait: yes
         name:  "Cody-test-{{ lookup('env', 'CIRCLE_SHA1')|truncate(8,True,'') }}{{ '%Y%m%d%H%M%S'|strftime }}"
         state: present
@@ -44,7 +57,7 @@
     - name: Create inventory file with Rackspace server device details
       blockinfile:
         create: yes
-        path: "{{ playbook_dir }}/inventory"
+        path: "{{ lookup('env', 'GITHUB_WORKSPACE') }}/inventory"
         block: |
           all:
             hosts:
@@ -57,7 +70,7 @@
     - name: Create HOSTALIASES .hosts file, - a dynamic alternative of /etc/hosts
       blockinfile:
         create: yes
-        path: "{{ playbook_dir }}/.hosts"
+        path: "{{ lookup('env', 'GITHUB_WORKSPACE') }}/.hosts"
         block: |
           # see https://unix.stackexchange.com/a/226318/217844
           metal {{ rackspace.instances[0].rax_accessipv4 }}.xip.io

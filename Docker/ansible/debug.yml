@@ -1,0 +1,38 @@
+- name: "[Debug] Printing ansible_env"
+  debug:
+    var: ansible_env
+  when:
+    - debug_workflow is defined
+    - debug_workflow
+- name: "[Debug] Printing ansible python"
+  debug:
+    msg: "Ansible python: {{ ansible_playbook_python }}"
+  when:
+    - debug_workflow is defined
+    - debug_workflow
+- name: "[Debug] Getting PYTHONPATH"
+  local_action: shell python3 -c 'import sys; print(":".join(sys.path))'
+  register: pythonpath
+  when:
+    - debug_workflow is defined
+    - debug_workflow
+- name: "[Debug] Print python path"
+  debug:
+    msg: "PYTHONPATH: {{ pythonpath.stdout }}"
+  when:
+    - debug_workflow is defined
+    - debug_workflow
+- name: "[Debug] Check for Rackspace module dependencies"
+  command: "{{ ansible_python_interpreter | default('/usr/bin/python') }} -c 'import {{ module }}; print({{ module }}.__version__)'"
+  vars:
+    module: pyrax
+  register: test
+  when:
+    - debug_workflow is defined
+    - debug_workflow
+- name: "[Debug] Was the module found"
+  debug:
+    var: test.stdout
+  when:
+    - debug_workflow is defined
+    - debug_workflow

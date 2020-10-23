@@ -16,3 +16,4 @@ runs:
   image: 'docker://bunchc/ironic-factory'
   args:
     - ${{ inputs.playbook }}
+    - ${{ inputs.inventory }}
