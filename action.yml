@@ -2,10 +2,13 @@
 name: 'Run Ansible'
 description: 'Runs Ansible'
 inputs:
-  playbook:  # id of input
-    description: 'ansible playbook to run'
+  playbook:  # Which ansible playbook to run
+    description: 'Ansible playbook to run'
     required: true
-    default: 'destroy.yml'
+    default: '/ansible/destroy.yml'
+  inventory: # Path to ansible inventory file
+    description: 'Ansible inventory file'
+    required: false
 outputs:
   starttime:
     description: 'The time ansible-playbook started.'
