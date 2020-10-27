@@ -2,11 +2,15 @@
 name: 'Run Ansible'
 description: 'Runs Ansible'
 inputs:
-  playbook:  # Which ansible playbook to run
+  verbosity:
+    description: 'Verbosity level of Ansible run. Passes -vvv to ansible-playbook'
+    default: "-vvv"
+    required: true
+  playbook:
     description: 'Ansible playbook to run'
     required: true
     default: '/ansible/destroy.yml'
-  inventory: # Path to ansible inventory file
+  inventory:
     description: 'Ansible inventory file'
     required: false
 outputs:
@@ -18,5 +22,6 @@ runs:
   using: 'docker'
   image: 'docker://bunchc/ironic-factory'
   args:
+    - ${{ inputs.verbosity }}
     - ${{ inputs.playbook }}
     - ${{ inputs.inventory }}
